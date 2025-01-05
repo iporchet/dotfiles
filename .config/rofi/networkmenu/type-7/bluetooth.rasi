@@ -1,0 +1,20 @@
+/**
+ * Bluetooth Menu Theme
+ * Matches network menu style
+ **/
+@import "style-4.rasi"
+
+/* Bluetooth-specific overrides */
+window {
+    width: 400px;
+    location: east;
+    x-offset: -20px;
+}
+
+listview {
+    lines: 10;  /* Show more devices */
+}
+
+element-icon {
+    size: 24px;
+}

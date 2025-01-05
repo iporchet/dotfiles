@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+for cmd in rofi networkmanager_dmenu bluetoothctl lsblk udisksctl yazi; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        notify-send "Error" "$cmd is not installed"
+        exit 1
+    fi
+done
+
+dir="$HOME/.config/rofi/networkmenu/type-7"
+theme='style-4'
+
+WIFI="Network Connections"
+BLUETOOTH="Bluetooth Devices"
+STORAGE="Storage Devices"
+BT_DISCOVERABLE="Toggle Discoverable"
+
+get_mountable_devices() {
+    lsblk -lpno NAME,SIZE,TYPE,MOUNTPOINT | awk '$3=="part" && $4=="" {print $1 " (" $2 ")"}'
+}
+
+get_mounted_devices() {
+    lsblk -lpno NAME,SIZE,TYPE,MOUNTPOINT | awk '$3=="part" && $4~"/run/media" {print $1 " (" $2 ") mounted at " $4}'
+}
+
+mount_device() {
+    local device=$1
+    device=${device%% *}  # Remove size info, keep only device path
+    if output=$(udisksctl mount -b "$device" 2>&1); then
+        mount_point=$(echo "$output" | grep -o '/run/media[^ ]*')
+        if [ -n "$mount_point" ]; then
+            notify-send "💾 Device Mounted" "$device mounted at $mount_point"
+            yazi "$mount_point" &
+        else
+            notify-send "❌ Mount Failed" "Could not determine mount point"
+        fi
+    else
+        notify-send "❌ Mount Failed" "Failed to mount $device"
+    fi
+}
+
+unmount_device() {
+    local device=$1
+    device=${device%% *}  # Remove everything after device path
+    if udisksctl unmount -b "$device"; then
+        notify-send "💾 Device Unmounted" "$device has been unmounted"
+    else
+        notify-send "❌ Unmount Failed" "Failed to unmount $device"
+    fi
+}
+
+storage_menu() {
+    local options="Mount Device\nUnmount Device\nBack"
+    local chosen="$(echo -e "$options" | rofi -dmenu -p "Storage" -theme "${dir}/${theme}.rasi")"
+    case "$chosen" in
+        "Mount Device")
+            device=$(get_mountable_devices | rofi -dmenu -p "Select device" -theme "${dir}/${theme}.rasi")
+            [ -n "$device" ] && mount_device "$device"
+            ;;
+        "Unmount Device")
+            device=$(get_mounted_devices | rofi -dmenu -p "Select device" -theme "${dir}/${theme}.rasi")
+            [ -n "$device" ] && unmount_device "$device"
+            ;;
+    esac
+}
+
+is_discoverable() {
+    bluetoothctl show | grep -q "Discoverable: yes"
+}
+
+rofi_cmd() {
+    rofi -dmenu \
+        -p "Network" \
+        -theme "${dir}/${theme}.rasi"
+}
+
+bluetooth_menu() {
+    local bt_status
+    if is_discoverable; then
+        bt_status="Discoverable: On"
+    else
+        bt_status="Discoverable: Off"
+    fi
+    local options="$BT_DISCOVERABLE ($bt_status)\nView/Connect Devices"
+    local chosen
+    chosen="$(echo -e "$options" | rofi -dmenu -p "Bluetooth" -theme "${dir}/${theme}.rasi")"
+    case "$chosen" in
+        "View/Connect Devices")
+            rofi-bluetooth -theme "${dir}/${theme}.rasi"
+            ;;
+        *"Discoverable:"*)
+            if is_discoverable; then
+                bluetoothctl discoverable off
+                notify-send "Bluetooth" "Discoverable mode disabled"
+            else
+                bluetoothctl discoverable on
+                notify-send "Bluetooth" "Discoverable mode enabled"
+            fi
+            ;;
+    esac
+}
+
+options="$WIFI\n$BLUETOOTH\n$STORAGE"
+chosen="$(echo -e "$options" | rofi_cmd)"
+case $chosen in
+    $WIFI)
+        if ! networkmanager_dmenu -theme "${dir}/${theme}.rasi"; then
+            notify-send "Error" "Failed to launch network menu"
+        fi
+        ;;
+    $BLUETOOTH)
+        bluetooth_menu
+        ;;
+    $STORAGE)
+        storage_menu
+        ;;
+esac

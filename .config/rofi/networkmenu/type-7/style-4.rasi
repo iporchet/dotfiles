@@ -1,0 +1,27 @@
+/**
+ * Network Menu Theme
+ * Matches your current style-4
+ **/
+@import "~/.config/rofi/launchers/type-7/style-4.rasi"
+
+/* Override specific settings for network menu */
+window {
+    width: 400px;
+    location: east;
+    x-offset: -20px;  /* Distance from right edge */
+    y-offset: 0px;    /* Vertical position */
+    anchor: east;     /* Anchor to right side */
+}
+
+listview {
+    lines: 2;
+}
+
+element-icon {
+    size: 24px;
+}
+
+/* Additional network-specific styling if needed */
+element-text {
+    vertical-align: 0.5;
+}

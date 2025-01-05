@@ -1,0 +1,32 @@
+
+[window]
+opacity = 0.10
+padding = { x = 0, y = 0 }
+decorations = "none"
+startup_mode = "Windowed"
+dynamic_padding = true
+
+[font]
+size = 7  # Bigger number = bigger text
+normal = { family = "Hack", style = "Regular" }
+bold = { family = "Hack", style = "Bold" }
+italic = { family = "Hack", style = "Italic" }
+bold_italic = { family = "Hack", style = "Bold Italic" }
+
+[colors]
+draw_bold_text_with_bright_colors = true
+
+[cursor]
+style = { shape = "Block", blinking = "On" }
+blink_interval = 750
+
+[mouse]
+hide_when_typing = true
+
+[selection]
+save_to_clipboard = true
+
+[general]
+# ~/.config/alacritty/alacritty.toml
+
+import = ["~/.config/alacritty/themes/themes/gruvbox_dark.toml"]
