@@ -7,11 +7,11 @@ startup_mode = "Windowed"
 dynamic_padding = true
 
 [font]
-size = 7  # Bigger number = bigger text
-normal = { family = "Hack", style = "Regular" }
-bold = { family = "Hack", style = "Bold" }
-italic = { family = "Hack", style = "Italic" }
-bold_italic = { family = "Hack", style = "Bold Italic" }
+size = 6
+normal = { family = "JetBrainsMono", style = "Regular" }
+bold = { family = "JetBrainsMono", style = "Bold" }
+italic = { family = "JetBrainsMono", style = "Italic" }
+bold_italic = { family = "JetBrainsMono", style = "Bold Italic" }
 
 [colors]
 draw_bold_text_with_bright_colors = true
@@ -27,6 +27,6 @@ hide_when_typing = true
 save_to_clipboard = true
 
 [general]
-# ~/.config/alacritty/alacritty.toml
+#~/.config/alacritty/alacritty.toml
 
-import = ["~/.config/alacritty/themes/themes/gruvbox_dark.toml"]
+import = ["~/.config/alacritty/themes/alacritty-theme/themes/gruvbox_dark.toml"]
